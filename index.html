@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Scramble Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Word Scramble Challenge</h1>
+            <p>Unscramble the letters to find the correct word!</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="game-area" class="game-area">
+            <div id="scrambled-word">-</div>
+
+            <input type="text" id="guess-input" placeholder="Enter your guess" />
+            <button id="submit-button">Submit</button>
+
+            <div id="feedback">
+                <p id="feedback-message">Good luck!</p>
+            </div>
+
+            <div id="stats">
+                <p>Score: <span id="score">0</span></p>
+                <p>Time Remaining: <span id="timer">60</span> seconds</p>
+            </div>
+
+            <button id="restart-button">Restart</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Word Scramble Challenge. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const words = ["javascript", "coding", "scramble", "challenge", "programming", "developer", "function", "variable"];
+        let currentWord = "";
+        let scrambledWord = "";
+        let score = 0;
+        let timeRemaining = 60;
+        let timerInterval;
+
+        const scrambledWordDisplay = document.getElementById("scrambled-word");
+        const guessInput = document.getElementById("guess-input");
+        const submitButton = document.getElementById("submit-button");
+        const feedbackMessage = document.getElementById("feedback-message");
+        const scoreDisplay = document.getElementById("score");
+        const timerDisplay = document.getElementById("timer");
+        const restartButton = document.getElementById("restart-button");
+
+        function startGame() {
+            score = 0;
+            timeRemaining = 60;
+            feedbackMessage.textContent = "Good luck!";
+            scoreDisplay.textContent = score;
+            timerDisplay.textContent = timeRemaining;
+            guessInput.disabled = false;
+            submitButton.disabled = false;
+            loadNewWord();
+            startTimer();
+        }
+
+        function loadNewWord() {
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            scrambledWord = shuffleWord(currentWord);
+            scrambledWordDisplay.textContent = scrambledWord;
+        }
+
+        function shuffleWord(word) {
+            const letters = word.split("");
+            for (let i = letters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [letters[i], letters[j]] = [letters[j], letters[i]];
+            }
+            return letters.join("");
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerDisplay.textContent = timeRemaining;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    feedbackMessage.textContent = `Time's up! The correct word was "${currentWord}". Your final score is ${score}.`;
+                    guessInput.disabled = true;
+                    submitButton.disabled = true;
+                }
+            }, 1000);
+        }
+
+        submitButton.addEventListener("click", () => {
+            const playerGuess = guessInput.value.toLowerCase();
+
+            if (playerGuess === currentWord) {
+                feedbackMessage.textContent = "Correct!";
+                score++;
+                scoreDisplay.textContent = score;
+                loadNewWord();
+            } else {
+                feedbackMessage.textContent = "Wrong! Try again.";
+            }
+
+            guessInput.value = "";
+        });
+
+        restartButton.addEventListener("click", startGame);
+
+        startGame();
+    </script>
+</body>
+</html>
